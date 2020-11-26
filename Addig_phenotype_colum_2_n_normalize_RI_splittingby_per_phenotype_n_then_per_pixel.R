@@ -205,5 +205,3 @@ apply( titrated_matix,2 , function(x) { max(unlist(lapply( list_vecs_name_relati
 write.table( file= paste0(results_path,"/",basename(intable_path),"_Relative_intesity_Normalized_by_pixel.tsv" ), titrated_matix, sep="\t", col.names = TRUE)
 
 
-
-
