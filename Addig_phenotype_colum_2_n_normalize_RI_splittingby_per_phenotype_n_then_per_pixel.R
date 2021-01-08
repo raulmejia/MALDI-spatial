@@ -44,53 +44,29 @@ out_table_path <- myargs[2]
 results_path <- myargs[3] 
 # Parameters in Spatial_MALDI.sh
 
-x1_p1 <- 80
-x2_p1 <- 109
-y1_p1 <- 25
-y2_p1 <- 56
-p1_name <-"124_Ctrl"
+# x1_p1 <- 80; x2_p1 <- 109; y1_p1 <- 25; y2_p1 <- 56; p1_name <-"124_Ctrl"
+x1_p1 <- myargs[4]; x2_p1 <- myargs[5]; y1_p1 <- myargs[6]; y2_p1 <- myargs[7]; p1_name <- myargs[8]
 
-x1_p2 <- 78
-x2_p2 <- 109
-y1_p2 <- 70
-y2_p2 <- 101
-p2_name <-"124_CQ_20_uM"
+#x1_p2 <- 78; x2_p2 <- 109; y1_p2 <- 70; y2_p2 <- 101; p2_name <-"124_CQ_20_uM"
+x1_p2 <- myargs[9]; x2_p2 <- myargs[10]; y1_p2 <- myargs[11]; y2_p2 <- myargs[12]; p2_name <-myargs[13]
 
-x1_p3 <- 126
-x2_p3 <- 155
-y1_p3 <- 25
-y2_p3 <- 54
-p3_name <-"127"
+#x1_p3 <- 126; x2_p3 <- 155; y1_p3 <- 25; y2_p3 <- 54; p3_name <-"127"
+x1_p3 <- myargs[14]; x2_p3 <- myargs[15]; y1_p3 <- myargs[16]; y2_p3 <- myargs[17]; p3_name <-myargs[18]
 
-x1_p4 <- 124
-x2_p4 <- 156
-y1_p4 <- 73
-y2_p4 <- 105
-p4_name <-"127_CQ_20_uM"
+#x1_p4 <- 124; x2_p4 <- 156; y1_p4 <- 73; y2_p4 <- 105; p4_name <-"127_CQ_20_uM"
+x1_p4 <- myargs[19]; x2_p4 <- myargs[20]; y1_p4 <- myargs[21]; y2_p4 <- myargs[22]; p4_name <-myargs[23]
 
-x1_p5 <- 194
-x2_p5 <- 220
-y1_p5 <- 29
-y2_p5 <- 57
-p5_name <-"CAU"
+#x1_p5 <- 194; x2_p5 <- 220; y1_p5 <- 29; y2_p5 <- 57; p5_name <-"CAU"
+x1_p5 <- myargs[24]; x2_p5 <- myargs[25]; y1_p5 <- myargs[26]; y2_p5 <- myargs[27]; p5_name <-myargs[28]
 
-x1_p6 <- 191
-x2_p6 <- 216
-y1_p6 <- 75
-y2_p6 <- 104
-p6_name <-"CAU_CQ_20_uM"
+#x1_p6 <- 191; x2_p6 <- 216; y1_p6 <- 75; y2_p6 <- 104; p6_name <-"CAU_CQ_20_uM"
+x1_p6 <- myargs[29]; x2_p6 <- myargs[30]; y1_p6 <- myargs[31]; y2_p6 <- myargs[32]; p6_name <-myargs[33]
 
-x1_p7 <- 236
-x2_p7 <- 265
-y1_p7 <- 32
-y2_p7 <- 59
-p7_name <-"124_2_Ctrl"
+#x1_p7 <- 236; x2_p7 <- 265; y1_p7 <- 32; y2_p7 <- 59; p7_name <-"124_2_Ctrl"
+x1_p7 <- myargs[34]; x2_p7 <- myargs[35]; y1_p7 <- myargs[36]; y2_p7 <- myargs[37]; p7_name <-myargs[38]
 
-x1_p8 <- 236
-x2_p8 <- 266
-y1_p8 <- 76
-y2_p8 <- 105
-p8_name <-"124_2_CQ_20_uM"
+#x1_p8 <- 236; x2_p8 <- 266; y1_p8 <- 76; y2_p8 <- 105; p8_name <-"124_2_CQ_20_uM"
+x1_p8 <- myargs[39]; x2_p8 <- myargs[40]; y1_p8 <- myargs[41]; y2_p8 <- myargs[42]; p8_name <-myargs[43]
 
 ##############
 # Testing consistency of the input parameters
@@ -171,8 +147,8 @@ list_vecs_name_relative_int <- lapply(list_subtables, from_matrix_2_vector_of_Co
 
 # Creating the reference name vector of compounds
 vector_of_names <- vector()
-for(k in 1:length(list_vecs_name_relative_int_test)){
-  vector_of_names <- c(vector_of_names, names(list_vecs_name_relative_int_test[[k]]) )
+for(k in 1:length(list_vecs_name_relative_int)){
+  vector_of_names <- c(vector_of_names, names(list_vecs_name_relative_int[[k]]) )
 }
 union_compund_names <- sort( unique( vector_of_names) , decreasing =  TRUE)  # here are the rownames
 

@@ -61,55 +61,32 @@ myargs <- commandArgs(trailingOnly = TRUE)
 intable_path <- myargs[1] 
 out_table_path <- myargs[2] 
 results_path <- myargs[3] 
-# Parameters in Spatial_MALDI.sh
+# Parameters in Spatial_MALDI_2nd_data_set.sh
 
-x1_p1 <- 80
-x2_p1 <- 109
-y1_p1 <- 25
-y2_p1 <- 56
-p1_name <-"124_Ctrl"
+# x1_p1 <- 80; x2_p1 <- 109; y1_p1 <- 25; y2_p1 <- 56; p1_name <-"124_Ctrl"
+x1_p1 <- myargs[4]; x2_p1 <- myargs[5]; y1_p1 <- myargs[6]; y2_p1 <- myargs[7]; p1_name <- myargs[8]
 
-x1_p2 <- 78
-x2_p2 <- 109
-y1_p2 <- 70
-y2_p2 <- 101
-p2_name <-"124_CQ_20_uM"
+#x1_p2 <- 78; x2_p2 <- 109; y1_p2 <- 70; y2_p2 <- 101; p2_name <-"124_CQ_20_uM"
+x1_p2 <- myargs[9]; x2_p2 <- myargs[10]; y1_p2 <- myargs[11]; y2_p2 <- myargs[12]; p2_name <-myargs[13]
 
-x1_p3 <- 126
-x2_p3 <- 155
-y1_p3 <- 25
-y2_p3 <- 54
-p3_name <-"127"
+#x1_p3 <- 126; x2_p3 <- 155; y1_p3 <- 25; y2_p3 <- 54; p3_name <-"127"
+x1_p3 <- myargs[14]; x2_p3 <- myargs[15]; y1_p3 <- myargs[16]; y2_p3 <- myargs[17]; p3_name <-myargs[18]
 
-x1_p4 <- 124
-x2_p4 <- 156
-y1_p4 <- 73
-y2_p4 <- 105
-p4_name <-"127_CQ_20_uM"
+#x1_p4 <- 124; x2_p4 <- 156; y1_p4 <- 73; y2_p4 <- 105; p4_name <-"127_CQ_20_uM"
+x1_p4 <- myargs[19]; x2_p4 <- myargs[20]; y1_p4 <- myargs[21]; y2_p4 <- myargs[22]; p4_name <-myargs[23]
 
-x1_p5 <- 194
-x2_p5 <- 220
-y1_p5 <- 29
-y2_p5 <- 57
-p5_name <-"CAU"
+#x1_p5 <- 194; x2_p5 <- 220; y1_p5 <- 29; y2_p5 <- 57; p5_name <-"CAU"
+x1_p5 <- myargs[24]; x2_p5 <- myargs[25]; y1_p5 <- myargs[26]; y2_p5 <- myargs[27]; p5_name <-myargs[28]
 
-x1_p6 <- 191
-x2_p6 <- 216
-y1_p6 <- 75
-y2_p6 <- 104
-p6_name <-"CAU_CQ_20_uM"
+#x1_p6 <- 191; x2_p6 <- 216; y1_p6 <- 75; y2_p6 <- 104; p6_name <-"CAU_CQ_20_uM"
+x1_p6 <- myargs[29]; x2_p6 <- myargs[30]; y1_p6 <- myargs[31]; y2_p6 <- myargs[32]; p6_name <-myargs[33]
 
-x1_p7 <- 236
-x2_p7 <- 265
-y1_p7 <- 32
-y2_p7 <- 59
-p7_name <-"124_2_Ctrl"
+#x1_p7 <- 236; x2_p7 <- 265; y1_p7 <- 32; y2_p7 <- 59; p7_name <-"124_2_Ctrl"
+x1_p7 <- myargs[34]; x2_p7 <- myargs[35]; y1_p7 <- myargs[36]; y2_p7 <- myargs[37]; p7_name <-myargs[38]
 
-x1_p8 <- 236
-x2_p8 <- 266
-y1_p8 <- 76
-y2_p8 <- 105
-p8_name <-"124_2_CQ_20_uM"
+#x1_p8 <- 236; x2_p8 <- 266; y1_p8 <- 76; y2_p8 <- 105; p8_name <-"124_2_CQ_20_uM"
+x1_p8 <- myargs[39]; x2_p8 <- myargs[40]; y1_p8 <- myargs[41]; y2_p8 <- myargs[42]; p8_name <-myargs[43]
+
 
 ##############
 # Testing consistency of the input parameters
@@ -167,7 +144,7 @@ list_subtables_phenotype_columns_included <- split(table_with_phenotype_column_c
 list_subtables_unique_Name <- lapply(list_subtables_phenotype_columns_included, function(K){ K[ !duplicated( K$Name) , ] })
 list_subtables_unique_Name_tabled <- do.call(rbind.data.frame, list_subtables_unique_Name)
 ggplot(list_subtables_unique_Name_tabled, aes(x=as.factor(phenotype) )) +
-  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of compouns per phenotype") + xlab("Phenotypes") # compounds per phenotype
+  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of compounds per phenotype") + xlab("Phenotypes") # compounds per phenotype
 unlist(lapply( list_subtables_unique_Name, function(x){dim(x)[1]}))
 
 # compounds per pixel
@@ -290,9 +267,11 @@ titrated_matrix <- matrix( unlist(list_of_titrated_matrices) , ncol= length(list
 colnames(titrated_matrix) <- names(list_of_titrated_matrices)
 rownames(titrated_matrix) <- union_compund_names
 
+
 head(titrated_matrix)
-heatmap( titrated_matrix[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")])
-write.table( file= paste0(results_path,"/",basename(intable_path),"_Relative_intesity_Normalized_by_pixel.tsv" ), titrated_matix, sep="\t", col.names = TRUE)
+?heatmap
+heatmap( titrated_matrix[,c(p1_name,p2_name,p7_name,p8_name)],main = "Relative intesity Normalized by pixel")
+write.table( file= paste0(results_path,"/",basename(intable_path),"_Relative_intesity_Normalized_by_pixel.tsv" ), titrated_matrix, sep="\t", col.names = TRUE)
 
 # --- Getting Proportions of compounds inside the relative intensity of the average pixel ----
 
@@ -323,9 +302,9 @@ make_a_matrix_out_of_me <- function(list_with_matrices ){
 
 matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno <- make_a_matrix_out_of_me(list_proportions_of_absoluteQ_in_the_average_pix_per_pheno)
 head(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)
-heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)
+heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno, main="Proportions of absolute Q in the avg pixel")
 
-heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")])
+heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c(p1_name,p2_name,p7_name,p8_name)] , main="Proportions of absolute Q in the avg pixel")
 
 colnames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)
 rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)
@@ -355,11 +334,11 @@ sn_PE_rows<-rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_phen
 
 "1,2-diacyl-sn-glycero-3-phosphoethanolamine"
 
-head(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")][ PE_rows, ])
-heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")][ PE_rows, ])
-heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")][ sn_PE_rows, ])
+head(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c(p1_name,p2_name,p7_name,p8_name)][ PE_rows, ])
+heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c(p1_name,p2_name,p7_name,p8_name)][ PE_rows, ])
+heatmap(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c(p1_name,p2_name,p7_name,p8_name)][ sn_PE_rows, ])
 
-matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")]["PE(19:0/19:0);1.2-dinonadecanoyl-sn-glycero-3-phosphoethanolamine", ]
+matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno[,c(p1_name,p2_name,p7_name,p8_name)]["PE(19:0/19:0);1.2-dinonadecanoyl-sn-glycero-3-phosphoethanolamine", ]
 
 
 
