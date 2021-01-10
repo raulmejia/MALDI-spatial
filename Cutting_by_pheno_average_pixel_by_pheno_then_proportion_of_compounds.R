@@ -325,7 +325,7 @@ PE_rows <- grep("phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_i
 
 rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)[grep("glycero-3-phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno))]
 rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)[grep("-sn-glycero-3-phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno))]
-<- rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)[grep("anoyl-sn-glycero-3-phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno))]
+ rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)[grep("anoyl-sn-glycero-3-phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno))]
 
 grep("diac",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno)[grep("-sn-glycero-3-phosphoethanolamine",rownames(matrix_proportions_of_absoluteQ_in_the_average_pix_per_pheno))])
 
