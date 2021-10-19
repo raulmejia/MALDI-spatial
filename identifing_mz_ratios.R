@@ -119,8 +119,11 @@ p8_name <-"124_2_CQ_20_uM"
 ##############
 # Loading the data and building the extracted data
 ##############
-results_path <- normalizePath(results_path); dir.create(results_path , recursive = TRUE)
+ dir.create(results_path , recursive = TRUE) ; results_path <- normalizePath(results_path)
 
+#####
+## Creating a submatrix with the desired features
+#####
 intable <-read.table( intable_path , header = TRUE, sep=",") # reading the data
 p1 <- intable %>% filter(Coordinate.X > x1_p1) %>% filter(Coordinate.X < x2_p1) %>% filter(Coordinate.Y > y1_p1) %>% filter(Coordinate.Y < y2_p1) # extracting subtable for phenotype 1
 p2 <- intable %>% filter(Coordinate.X > x1_p2) %>% filter(Coordinate.X < x2_p2) %>% filter(Coordinate.Y > y1_p2) %>% filter(Coordinate.Y < y2_p2)
@@ -131,17 +134,19 @@ p6 <- intable %>% filter(Coordinate.X > x1_p6) %>% filter(Coordinate.X < x2_p6) 
 p7 <- intable %>% filter(Coordinate.X > x1_p7) %>% filter(Coordinate.X < x2_p7) %>% filter(Coordinate.Y > y1_p7) %>% filter(Coordinate.Y < y2_p7)
 p8 <- intable %>% filter(Coordinate.X > x1_p8) %>% filter(Coordinate.X < x2_p8) %>% filter(Coordinate.Y > y1_p8) %>% filter(Coordinate.Y < y2_p8)
 
-list_subtables <-list(p1,p2,p3,p4,p5,p6,p7,p8) # putting the sutables in a list
-names(list_subtables) <-c(p1_name,p2_name,p3_name,p4_name,p5_name,p6_name,p7_name,p8_name) # adding the names to the previous list
-table_with_phenotype_column_2 <- do.call(rbind.data.frame, list_subtables) # pasting the previous extracted subtables ( that only conintain the desired phenotype data)
+list_subtables <-list(p1,p2,p3,p4,p5,p6,p7,p8) # putting the subtables in a list
+names(list_subtables) <-c(p1_name,p2_name,p3_name,p4_name,p5_name,p6_name,p7_name,p8_name) # giving names to elements to the previous list
+Table_extracted_features_labeled_by_phenotype <- do.call(rbind.data.frame, list_subtables) # pasting vertically (by row) the previous extracted subtables ( that only conintain the desired phenotype data)
+Table_extracted_features_labeled_by_phenotype
 
-table_with_phenotype_column_clean <- cbind(rownames(table_with_phenotype_column_2),table_with_phenotype_column_2) # adding a column at the beginning to mark the phenotypes
+table_with_phenotype_column_clean <- cbind( rownames( Table_extracted_features_labeled_by_phenotype ) , Table_extracted_features_labeled_by_phenotype ) # adding a column at the beginning to mark the phenotypes
 colnames(table_with_phenotype_column_clean)[1]<-"phenotype"
 table_with_phenotype_column_clean$phenotype<- gsub("\\..*","",table_with_phenotype_column_clean$phenotype)
 
-write.table(file=paste0(results_path,"/",basename(intable_path),"_cutted_and_annoted_according_phenotypes_coordinates.tsv")
-            , table_with_phenotype_column_clean, sep=",", col.names = TRUE, row.names = FALSE ) # writing down the new generatad table
+write.table(file=paste0(results_path,"/",basename(intable_path),"_cutted_and_annoted_according_phenotypes_coordinates.tsv") # saving the generated matrix
+            , table_with_phenotype_column_clean, sep=",", col.names = TRUE, row.names = FALSE ) 
 
+####### Exploring the compounds with RelInt =100 (the most abundant isomers)
 RI100 <- intable %>% filter( Relative.Intensity.... == 100 ) # Extracting the compounds with RelInt = 100 (the most abundant isomers)
 length( unique(table_with_phenotype_column_clean$ID)) # number of pixels in the input table
 length( unique( intable$Name) ) # number of different compounds
@@ -158,33 +163,50 @@ pixels_perphenotyphe_list <- lapply(pixels_perphenotyphe, function(x) x[[1]])
 pixels_perphenotyphe_vec <- as.vector(unlist(pixels_perphenotyphe_list))
 names(pixels_perphenotyphe_vec) <- names(pixels_perphenotyphe )
 pixels_perphenotyphe_vec/max(pixels_perphenotyphe_vec)
-
+name_for_the_pdf <- paste0(results_path, "/",basename(intable_path), "_Number_of_pixels_per_phenotype.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
 ggplot(table_with_phenotype_column_clean, aes(x=as.factor(phenotype) )) +
-  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of pixels per phenotype") + xlab("Phenotypes")
+  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of pixels per phenotype") + xlab("Phenotypes") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+dev.off()
 
 # Number of m/z compounds per phenotype
 list_subtables_phenotype_columns_included <- split(table_with_phenotype_column_clean , table_with_phenotype_column_clean$phenotype ) # splitting by phenotype
 list_subtables_unique_mz <- lapply(list_subtables_phenotype_columns_included, function(K){ K[ !duplicated( K$Experimental.m.z ) , ] })
 unlist(lapply(list_subtables_unique_mz,function(x) dim(x)[1]))
 list_subtables_unique_mz_tabled <- do.call(rbind.data.frame, list_subtables_unique_mz)
+name_for_the_pdf <- paste0(results_path, "/",basename(intable_path), "_Number_of_m-z_per_phenotype.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
 ggplot(list_subtables_unique_mz_tabled, aes(x= as.factor(phenotype) )) +
-  geom_bar(color="blue", fill = rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of m/z per phenotype") + xlab("Phenotypes") # compounds per phenotype
+  geom_bar(color="blue", fill = rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of m/z per phenotype") + xlab("Phenotypes") +
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+dev.off()
 
 # compounds per pixel
-listfrom_table_with_phenotype_column_2_splitted_by_id <- split(table_with_phenotype_column_clean, table_with_phenotype_column_2$ID)
-listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name <- lapply(listfrom_table_with_phenotype_column_2_splitted_by_id, function(K){ K[ !duplicated( K$Name) , ] })
-tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name <- do.call(rbind.data.frame, listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name )
-ggplot( tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name , aes(x=as.factor(ID) )) +
-  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of compounds per pixel") + xlab("Phenotypes") # compounds per pixel across all phenotypes
+listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id <- 
+  split( table_with_phenotype_column_clean, Table_extracted_features_labeled_by_phenotype$ID)
 
-compunds_per_pixel <- unlist(lapply( listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name , function(x){dim(x)[1]}))
+listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name <-
+  lapply( listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id, function(K){ K[ !duplicated( K$Name) , ] })
+
+tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name <- 
+  do.call( rbind.data.frame, listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name )
+
+name_for_the_pdf <- paste0( results_path, "/", basename(intable_path) , "_Number_of_compounds_per_pixel.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
+ggplot( tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name , aes(x=as.factor(ID) )) +
+  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of compounds per pixel") + xlab("Phenotypes") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))# compounds per pixel across all phenotypes
+dev.off()
+
+compunds_per_pixel <- unlist(lapply( listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name , function(x){dim(x)[1]}))
 
 compunds_per_pixel_sorted <- sort(compunds_per_pixel, decreasing = TRUE)
 df_compunds_per_pixel <- data.frame(  compunds_per_pixel_sorted , rep(NA , length(compunds_per_pixel_sorted)) )
 rownames( df_compunds_per_pixel ) <- names( compunds_per_pixel_sorted ) ; colnames( df_compunds_per_pixel) <- c( "Comp_per_pix" , "Phenotype" )
 df_compunds_per_pixel$pixelID <- rownames( df_compunds_per_pixel) 
 
-ID_phenotype <- tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name[ !duplicated(tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_Name$ID), ]
+ID_phenotype <- tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name[ !duplicated(tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_Name$ID), ]
 
 
 for( k in df_compunds_per_pixel$pixelID ){
@@ -202,29 +224,41 @@ gk + geom_density(aes(fill=factor(Phenotype)), alpha=0.8) +
        fill="# Phenotypes")
 
 # Boxplot 
+name_for_the_pdf <- paste0( results_path, "/", basename(intable_path) , "Different_compounds_per_pixel_per_Phenotype_Boxplot.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
 g <- ggplot( df_compunds_per_pixel[,c(1,2)], aes(x=Phenotype, y=Comp_per_pix,color=Phenotype))
 g + geom_boxplot(varwidth=T) + 
   labs(title="Different compounds per pixel per Phenotype", 
        subtitle="Box Plot",
        caption="Source: Slide 1",
        x="Phenotypes",
-       y="Number of compounds")
+       y="Number of compounds") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+dev.off()
 
 # m/z per pixel
-listfrom_table_with_phenotype_column_2_splitted_by_id <- split(table_with_phenotype_column_clean, table_with_phenotype_column_2$ID)
-listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz <- lapply(listfrom_table_with_phenotype_column_2_splitted_by_id, function(K){ K[ !duplicated( K$Experimental.m.z) , ] })
-tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz <- do.call(rbind.data.frame, listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz )
-ggplot( tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz , aes(x=as.factor(ID) )) +
-  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of m/z per pixel") + xlab("Phenotypes") # compounds per pixel across all phenotypes
+listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id <-
+  split( table_with_phenotype_column_clean , Table_extracted_features_labeled_by_phenotype$ID)
 
-mz_per_pixel <- unlist(lapply( listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz , function(x){dim(x)[1]}))
+listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz <- 
+  lapply( listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id , function(K){ K[ !duplicated( K$Experimental.m.z) , ] })
+
+tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz <- do.call(rbind.data.frame, listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz )
+
+name_for_the_pdf <- paste0( results_path, "/", basename(intable_path) , "Number_of_mz_per_pixel.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
+ggplot( tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz , aes(x=as.factor(ID) )) +
+  geom_bar(color="blue", fill=rgb(0.1,0.4,0.5,0.7) ) + ggtitle("Number of m/z per pixel") + xlab("Phenotypes") # compounds per pixel across all phenotypes
+dev.off()
+
+mz_per_pixel <- unlist(lapply( listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz , function(x){dim(x)[1]}))
 
 mz_per_pixel_sorted <- sort(mz_per_pixel, decreasing = TRUE)
 df_mz_per_pixel <- data.frame(  mz_per_pixel_sorted , rep(NA , length(mz_per_pixel_sorted)) )
 rownames( df_mz_per_pixel ) <- names( mz_per_pixel_sorted ) ; colnames( df_mz_per_pixel ) <- c( "mz_per_pix" , "Phenotype" )
 df_mz_per_pixel$pixelID <- rownames( df_mz_per_pixel) 
 
-ID_phenotype_mz <- tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz[ !duplicated(tabled_listfrom_table_with_phenotype_column_2_splitted_by_id_unique_mz$ID), ]
+ID_phenotype_mz <- tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz[ !duplicated(tabled_listfrom_Table_extracted_features_labeled_by_phenotype_splitted_by_id_unique_mz$ID), ]
 
 
 for( k in df_mz_per_pixel$pixelID ){
@@ -242,14 +276,17 @@ gk + geom_density(aes(fill=factor(Phenotype)), alpha=0.8) +
        fill="# Phenotypes")
 
 # Boxplot 
+name_for_the_pdf <- paste0( results_path, "/", basename(intable_path) , "Different_mz_per_pixel_per_Phenotype_Boxplot.pdf" ) 
+pdf(  name_for_the_pdf , width = 7 , height = 7) # let's do a graph about it
 g <- ggplot( df_mz_per_pixel[,c(1,2)], aes(x=Phenotype, y=mz_per_pix,color=Phenotype))
 g + geom_boxplot(varwidth=T) + 
   labs(title="Different mz per pixel per Phenotype", 
        subtitle="Box Plot",
        caption="Source: Slide 1",
        x="Phenotypes",
-       y="Number of different m/z")
-
+       y="Number of different m/z")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+dev.off()
 
 
 
@@ -266,7 +303,7 @@ g + geom_boxplot(varwidth=T) +
 ############
 ### Calculating the "average pixel per phenotype"
 list_subtables_splitted_by_Name <- lapply( list_subtables, function(xx){split(xx,xx$Name)} ) # Split each phenotype into their "compound Names".
-list_subtables_Unique_Names <- lapply( list_subtables, function(xx){ xx[ !duplicated(xx$Name), ]} ) # eliminating duplicated names inside a same phenotype
+list_subtables_Unique_Names <- lapply( list_subtables, function(xx){ xx[ !duplicated(xx$Name), ]} ) # eliminating duplicated names inside a same phenotype ?? Can I do this?
 
 list_sums <- list()
 for(uoo in 1:length(list_subtables_splitted_by_Name) ){
@@ -341,7 +378,7 @@ rownames(titrated_matrix) <- union_compund_names
 
 head(titrated_matrix)
 heatmap( titrated_matrix[,c("124_Ctrl","124_CQ_20_uM","124_2_Ctrl","124_2_CQ_20_uM")])
-write.table( file= paste0(results_path,"/",basename(intable_path),"_Relative_intesity_Normalized_by_pixel.tsv" ), titrated_matix, sep="\t", col.names = TRUE)
+write.table( file= paste0(results_path,"/",basename(intable_path),"_Relative_intesity_Normalized_by_pixel.tsv" ), titrated_matrix, sep="\t", col.names = TRUE)
 
 # --- Getting Proportions of compounds inside the relative intensity of the average pixel ----
 
