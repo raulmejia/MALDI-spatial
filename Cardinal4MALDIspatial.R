@@ -1,5 +1,6 @@
 ###################################
-#### This script makes  https://github.com/raulmejia/DSP-Oszwald
+#### This script makes  https://github.com/raulmejia/..
+#### Based on https://www.bioconductor.org/packages/release/data/experiment/html/CardinalWorkflows.html
 ####      
 ####     Input description:
 ####        expression matrix: 
