@@ -27,22 +27,29 @@ if (!require("tidyverse")) {
   install.packages("tidyverse", ask =FALSE)
   library("tidyverse")
 }
-if (!require("Cardinal")) {
-  BiocManager::install("Cardinal", ask =FALSE)
-  library("Cardinal")
-}
 # apt-get install libtiff-dev
 if (!require("tiff")) {
   BiocManager::install("tiff", ask =FALSE)
   library("tiff")
 }
+#sudo apt-get install libfftw3-dev libfftw3-doc
 if (!require("fftwtools")) {
   BiocManager::install("fftwtools", ask =FALSE)
   library("fftwtools")
-} ## Error :/ 
+}
+if (!require("EBImage")) {
+  BiocManager::install("EBImage", ask =FALSE)
+  library("EBImage")
+}
+if (!require("Cardinal")) {
+  BiocManager::install("Cardinal", ask =FALSE)
+  library("Cardinal")
+}
+if (!require("CardinalWorkflows")) {
+  BiocManager::install("CardinalWorkflows", ask =FALSE)
+  library("CardinalWorkflows")
+}
 
-
-# tiff, fftwtools, EBImage , Cardinal
 
 
 ############################## 
@@ -84,14 +91,18 @@ myargs <- commandArgs(trailingOnly = TRUE)
 #bug# path_expression_matrix <- "/media/rmejia/mountme88/Projects/Maja-covid/Results/Normalizations/NK_Geo/Majalog2_OAZ1_HPRT1_ABCF1.tsv"
 path_expression_matrix <- myargs[1]
 
+#######
 data(pig206, package="CardinalWorkflows")
 pig206 <- as(pig206, "MSImagingExperiment")
 pig206
 image(pig206, mz=885.5, plusminus=0.25)
+image(pig206, mz=150.5, plusminus=0.25)
+str(pig206)
 
 #Preprocessing
 pig206_mean <- summarizeFeatures(pig206, "mean")
 plot(pig206_mean)
+
 
 
 
