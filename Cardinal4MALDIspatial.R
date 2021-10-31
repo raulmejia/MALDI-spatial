@@ -98,11 +98,111 @@ pig206
 image(pig206, mz=885.5, plusminus=0.25)
 image(pig206, mz=150.5, plusminus=0.25)
 str(pig206)
+str(pig206@featureData)
+pig206@featureData@mz
+pig206@featureData¨
+pig206@featureData@resolution
+
 
 #Preprocessing
 pig206_mean <- summarizeFeatures(pig206, "mean")
 plot(pig206_mean)
+str(pig206_mean)
+?summarizeFeatures
+?summarizePixels
+
+pig206_tic <- summarizePixels( pig206, c(tic="sum"))
+image(pig206_tic , mz=160, plusminus=0.25)
+dev.off()
+image(pig206_tic , mz=885.5, plusminus=0.25)
+image(pig206_tic)
+
+pig206_ref <- pig206_mean %>%
+  peakPick(SNR=3) %>%
+  peakAlign(ref="mean",
+            tolerance=0.5,
+            units="mz") %>%
+  peakFilter() %>%
+  process()
+image(pig206_ref)
+
+pig206_peaks <- pig206 %>%
+  normalize(method="tic") %>%
+  peakBin(ref=mz(pig206_ref),
+          tolerance=0.5,
+          units="mz") %>%
+  process()
+image(pig206_peaks)
+
+pig206_peaks
+
+image(pig206_peaks, mz=187) # heart
+image(pig206_peaks, mz=250)
+image(pig206_peaks, mz=350)
+image(pig206_peaks, mz=450)
+image(pig206_peaks, mz=530)
+image(pig206_peaks, mz=535)
+image(pig206_peaks, mz=537) # Liver
+image(pig206_peaks, mz=539)
+image(pig206_peaks, mz=550)
+image(pig206_peaks, mz=650)
+image(pig206_peaks, mz=660)
+image(pig206_peaks, mz=655)
+image(pig206_peaks, mz=670)
+image(pig206_peaks, mz=680)
+image(pig206_peaks, mz=690)
+dev.off()
+image(pig206_peaks, mz=700)
+image(pig206_peaks, mz=710)
+image(pig206_peaks, mz=720)
+image(pig206_peaks, mz=730)
+image(pig206_peaks, mz=790)
+image(pig206_peaks, mz=800)
+image(pig206_peaks, mz=805)
+image(pig206_peaks, mz=807)
+image(pig206_peaks, mz=820)
+image(pig206_peaks, mz=830)
+image(pig206_peaks, mz=840)# spinal cord
+
+
+pig206_pca <- PCA(pig206_peaks, ncomp=3)
+str(pig206_pca)
+image(pig206_pca, contrast.enhance="histogram", normalize.image="linear")
+?Cardinal::image
+plot(pig206_pca, lwd=2)
+
+########
+## Shrunken centroids
+set.seed(1)
+pig206_ssc <- spatialShrunkenCentroids(pig206_peaks, method="adaptive",
+                                       r=2, s=c(0,5,10,15,20,25), k=10)
+summary(pig206_ssc)
+
+list(s=c(10,15,20,25))
+
+image(pig206_ssc, model=list(s=c(10,15,20,25)))
+
+image(pig206_ssc, model=list(s=20))
+plot(pig206_ssc, model=list(s=20), lwd=2)
+
+cols <- discrete.colors(6)
+setup.layout(c(3,1))
+plot(pig206_ssc, model=list(s=20), column=1, col=cols[1], lwd=2, layout=NULL)
+plot(pig206_ssc, model=list(s=20), column=5, col=cols[5], lwd=2, layout=NULL)
+plot(pig206_ssc, model=list(s=20), column=6, col=cols[6], lwd=2, layout=NULL)
+
+plot(pig206_ssc, model=list(s=20), values="statistic", lwd=2)
+
+setup.layout(c(3,1))
+plot(pig206_ssc, model=list(s=20), values="statistic",
+     column=1, col=cols[1], lwd=2, layout=NULL)
+plot(pig206_ssc, model=list(s=20), values="statistic",
+     column=5, col=cols[5], lwd=2, layout=NULL)
+plot(pig206_ssc, model=list(s=20), values="statistic",
+     column=6, col=cols[6], lwd=2, layout=NULL)
 
 
 
-
+topFeatures(pig206_ssc, model=list(s=20), class==1)
+topFeatures(pig206_ssc, model=list(s=20), class==5)
+topFeatures(pig206_ssc, model=list(s=20), class==6)
