@@ -201,8 +201,25 @@ plot(pig206_ssc, model=list(s=20), values="statistic",
 plot(pig206_ssc, model=list(s=20), values="statistic",
      column=6, col=cols[6], lwd=2, layout=NULL)
 
-
-
 topFeatures(pig206_ssc, model=list(s=20), class==1)
 topFeatures(pig206_ssc, model=list(s=20), class==5)
 topFeatures(pig206_ssc, model=list(s=20), class==6)
+
+?CardinalWorkflows
+browseVignettes("CardinalWorkflows")
+data(cardinal, package="CardinalWorkflows")
+cardinal <- as(cardinal, "MSImagingExperiment")
+str(cardinal)
+cardinal
+cardinal@imageData
+str(cardinal@featureData)
+cardinal@elementMetadata@coord
+
+cardinal_mean <- summarizeFeatures(cardinal, "mean")
+?summarizeFeatures
+?aggregate
+??Cardinal::PeakPick
+cardinal_ref <- cardinal_mean %>% peakPick(SNR= 3)
+
+
+
