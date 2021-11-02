@@ -50,8 +50,6 @@ if (!require("CardinalWorkflows")) {
   library("CardinalWorkflows")
 }
 
-
-
 ############################## 
 ## Data given by the user
 ##############################
@@ -100,7 +98,7 @@ image(pig206, mz=150.5, plusminus=0.25)
 str(pig206)
 str(pig206@featureData)
 pig206@featureData@mz
-pig206@featureData¨
+pig206@featureData
 pig206@featureData@resolution
 
 
@@ -219,7 +217,40 @@ cardinal_mean <- summarizeFeatures(cardinal, "mean")
 ?summarizeFeatures
 ?aggregate
 ??Cardinal::PeakPick
-cardinal_ref <- cardinal_mean %>% peakPick(SNR= 3)
+cardinal_ref <- cardinal_mean %>%
+  peakPick(SNR=3) %>%
+  peakAlign(ref="mean",
+            tolerance=0.5,
+            units="mz") %>%
+  peakFilter() %>%
+  process()
+# %>%
+cardinal_peaks <- cardinal %>%
+  normalize(method="tic") %>%
+  peakBin(ref=mz(cardinal_ref),
+          tolerance=0.5,
+          units="mz") %>%
+  process()
+
+cardinal_peaks
+
+##### segmentation with SSC
+set.seed(1)
+cardinal_ssc <- spatialShrunkenCentroids(cardinal_peaks, method="adaptive",
+                                         r=2, s=c(10,20,30,40), k=10)
+summary(cardinal_ssc)
+image(cardinal_ssc)
+
+image(cardinal_ssc, model=list(s=40),
+      col=c("1"=NA, "2"="gray", "3"="black", "4"="firebrick",
+            "5"="brown", "6"="darkred", "7"="red"))
 
 
+topFeatures(cardinal_ssc, model=list(s=40), class==7)
 
+image(cardinal, mz=207)
+
+image(cardinal, mz=112.9746)
+image(cardinal, mz=115.0517)
+
+image(cardinal, mz=649)
