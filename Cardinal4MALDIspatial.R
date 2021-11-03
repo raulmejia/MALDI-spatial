@@ -254,3 +254,19 @@ image(cardinal, mz=112.9746)
 image(cardinal, mz=115.0517)
 
 image(cardinal, mz=649)
+
+# Building from Scratch a MSContinuousImagingExperiment
+# https://www.bioconductor.org/packages/release/bioc/vignettes/Cardinal/inst/doc/Cardinal-2-guide.html#building-from-scratch
+set.seed(2020)
+s <- simulateSpectrum(n=9, peaks=10, from=500, to=600)
+str(s)
+coord <- expand.grid(x=1:3, y=1:3)
+run <- factor(rep("run0", nrow(coord)))
+fdata <- MassDataFrame(mz=s$mz)
+pdata <- PositionDataFrame(run=run, coord=coord)
+out <- MSImagingExperiment(imageData=s$intensity,
+                           featureData=fdata,
+                           pixelData=pdata)
+head(s$intensity)
+dim(s$intensity)
+?PositionDataFrame
