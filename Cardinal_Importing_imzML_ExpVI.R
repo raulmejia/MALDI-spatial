@@ -1,13 +1,37 @@
 dir.create( recursive = TRUE,
             "/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Results/Cardinal_Spectrum/hiPSC_VI")
 
-hiPSC_VI <- readMSIData( "/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Data/what_is_here/maldi/VI_hiPSC/VI_hiPSC.imzML")
-plot(hiPSC_VI)
-hiPSC_VI_tic <- summarizePixels(  hiPSC_VI  , c(tic="sum"))
-?saveRDS
+hiPSC_VI <- readMSIData( "/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Data/what_is_here/maldi/VI_hiPSC/VI_hiPSC.imzML" )
 
+hiPSC_VI_tic <- summarizePixels(  hiPSC_VI  , c(tic="sum"))
+
+plot(hiPSC_VI@elementMetadata@coord[,"x"])
+plot(hiPSC_VI@elementMetadata@coord[,"y"])
+plot(hiPSC_VI@elementMetadata@coord[,"x"], hiPSC_VI@elementMetadata@coord[,"y"])
+
+image( hiPSC_VI , mz=509)
+image( hiPSC_VI_tic , mz=509)
+image( hiPSC_VI_mean_sumPixels , mz=509)
+image(hiPSC_VI , mz=655.92) # One distribution
+image( hiPSC_VI , mz=656.93)
+image( hiPSC_VI , mz=671)
+image( hiPSC_VI , mz=676) # Another distribution
+image( hiPSC_VI , mz=782)
+image( hiPSC_VI , mz=783)
+image( )
 range( hiPSC_VI@featureData@mz )
 hiPSC_VI_mean <- summarizeFeatures( hiPSC_VI, "mean")
+hiPSC_VI_mean_sumPixels <- summarizePixels( hiPSC_VI, "mean")
+str(hiPSC_VI_mean_sumPixels)
+
+hiPSC_VI_pixels_ref <- hiPSC_VI_mean_sumPixels %>%
+  peakPick(SNR=3) %>%
+  peakAlign(ref="mean",
+            tolerance=0.5,
+            units="mz") %>%
+  peakFilter() %>%
+  process()
+
 
 hiPSC_VI_ref <- hiPSC_VI_mean %>%
   peakPick(SNR=3) %>%

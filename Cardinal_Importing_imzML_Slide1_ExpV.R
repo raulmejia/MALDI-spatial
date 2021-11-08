@@ -39,6 +39,11 @@ if (!require("CardinalWorkflows")) {
 #hiPSC_200909 <- readMSIData( "/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Data/what_is_here/maldi/hiPSC_200909/hiPSC_200909_converted_fwhm_0.050000.imzML" )
 
 hiPSC_200909 <- readMSIData( "/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Data/what_is_here/maldi/hiPSC_200909/hiPSC_200909.imzML")
+str(hiPSC_200909)
+plot(hiPSC_200909@elementMetadata@coord[,"x"])
+plot(hiPSC_200909@elementMetadata@coord[,"y"])
+plot(hiPSC_200909@elementMetadata@coord[,"x"], hiPSC_200909@elementMetadata@coord[,"y"])
+
 plot(hiPSC_200909)
 plot(hiPSC_200909,x=150,y=150, plusminus=10, fun=mean)
 dev.off()
@@ -49,6 +54,7 @@ image(hiPSC_200909, mz=1000, plusminus=1)
 hiPSC_200909_tich <- summarizePixels( hiPSC_200909 , c(tic="sum"))
 str(hiPSC_200909)
 str(hiPSC_200909@featureData)
+range(hiPSC_200909@featureData@mz)
 
 image(hiPSC_200909_tich, mz=299, plusminus=1)
 image(hiPSC_200909_tich, mz=700, plusminus=0.25)
@@ -63,16 +69,15 @@ image(hiPSC_200909_tich, mz=1000, plusminus=1)
 # 783 (1)
 
 saveRDS( hiPSC_200909_tich, file="/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Results/Cardinal_Spectrum/hiPSC_200909/hiPSC_200909_tich.RDS")
-?saveRDS
 warnings()
 plot(hiPSC_200909_tich)
-
 
 str(hiPSC_200909_tich)
 
 range( hiPSC_200909@featureData@mz )
 
 hiPSC_200909_mean <- summarizeFeatures(hiPSC_200909, "mean")
+?summarizeFeatures
 
 hiPSC_200909_ref <- hiPSC_200909_mean %>%
   peakPick(SNR=3) %>%
@@ -92,13 +97,22 @@ hiPSC_200909_peaks <- hiPSC_200909 %>%
 saveRDS( hiPSC_200909_peaks , file="/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Results/Cardinal_Spectrum/hiPSC_200909/hiPSC_200909_peaks.RDS")
 
 #?plot
-# Hand selected peaks
-#image( hiPSC_200909_peaks , mz=537)
-image( hiPSC_200909_peaks , mz=600)
-image( hiPSC_200909_peaks , mz=700)
-image( hiPSC_200909_peaks , mz=750)
+
+image( hiPSC_200909 , mz=509)
+image( hiPSC_200909_peaks , mz=509)
+image( hiPSC_200909 , mz=655.92)
+image( hiPSC_200909_peaks , mz=655.92) # One distribution
+image( hiPSC_200909 , mz=656.93)
+image( hiPSC_200909_peaks , mz=656.93)
+image( hiPSC_200909 , mz=671)
+image( hiPSC_200909_peaks , mz=671)
+image( hiPSC_200909 , mz=676)
+image( hiPSC_200909_peaks , mz=676) # Another distribution
+image( hiPSC_200909 , mz=782)
 image( hiPSC_200909_peaks , mz=782)
-image( hiPSC_200909_peaks , mz=18354)
+image( hiPSC_200909 , mz=783)
+image( hiPSC_200909_peaks , mz=783)
+
 
 hiPSC_200909_pca <- PCA( hiPSC_200909_peaks , ncomp=3)
 saveRDS( hiPSC_200909_pca , file="/media/rmejia/mountme88/Projects/Phosoholipidosis/Proteomic-MALDI/Results/Cardinal_Spectrum/hiPSC_200909/hiPSC_200909_pca.RDS")
@@ -119,7 +133,14 @@ image( hiPSC_200909_ssc , model=list(s=c(10,15,20,25)))
 image( hiPSC_200909_ssc , model=list(s=c(0,5,10,15)))
 image(hiPSC_200909_ssc, model=list(s=5))
 
-plot(pig206_ssc, model=list( s=5), lwd=2 )
+
+plot(hiPSC_200909_ssc, model=list( s=25), lwd=2 )
+plot(hiPSC_200909_ssc, model=list( s=20), lwd=2 )
+plot(hiPSC_200909_ssc, model=list( s=15), lwd=2 )
+plot(hiPSC_200909_ssc, model=list( s=10), lwd=2 )
+plot(hiPSC_200909_ssc, model=list( s=5), lwd=2 )
+plot(hiPSC_200909_ssc, model=list( s=0), lwd=2 )
+
 
 cols <- discrete.colors(6)
 setup.layout(c(2,1))
