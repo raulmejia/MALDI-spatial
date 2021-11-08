@@ -81,18 +81,18 @@ parser$add_argument("-o", "--outputfolder", type="character",
 args <- parser$parse_args( )
 # print some progress messages to stderr if "quietly" wasn't requested
 
-########################################
-#### data given by the user
-#########################################
 myargs <- commandArgs(trailingOnly = TRUE)
 
 #bug# path_expression_matrix <- "/media/rmejia/mountme88/Projects/Maja-covid/Results/Normalizations/NK_Geo/Majalog2_OAZ1_HPRT1_ABCF1.tsv"
 path_expression_matrix <- myargs[1]
 
-#######
+#############################
+## 
+#############################
 data(pig206, package="CardinalWorkflows")
 pig206 <- as(pig206, "MSImagingExperiment")
 pig206
+plot(pig206)
 image(pig206, mz=885.5, plusminus=0.25)
 image(pig206, mz=150.5, plusminus=0.25)
 str(pig206)
@@ -100,7 +100,6 @@ str(pig206@featureData)
 pig206@featureData@mz
 pig206@featureData
 pig206@featureData@resolution
-
 
 #Preprocessing
 pig206_mean <- summarizeFeatures(pig206, "mean")
@@ -125,7 +124,7 @@ pig206_ref <- pig206_mean %>%
 image(pig206_ref)
 
 pig206_peaks <- pig206 %>%
-  normalize(method="tic") %>%
+  Cardinal::normalize(method="tic") %>%
   peakBin(ref=mz(pig206_ref),
           tolerance=0.5,
           units="mz") %>%
@@ -133,7 +132,7 @@ pig206_peaks <- pig206 %>%
 image(pig206_peaks)
 
 pig206_peaks
-
+?Cardinal::normalize
 image(pig206_peaks, mz=187) # heart
 image(pig206_peaks, mz=250)
 image(pig206_peaks, mz=350)
@@ -226,11 +225,25 @@ cardinal_ref <- cardinal_mean %>%
   process()
 # %>%
 cardinal_peaks <- cardinal %>%
-  normalize(method="tic") %>%
+  Cardinal::normalize(method="tic") %>%
   peakBin(ref=mz(cardinal_ref),
           tolerance=0.5,
           units="mz") %>%
   process()
+
+
+setCardinalBPPARAM(SerialParam())
+
+set.seed(2)
+data <- simulateImage(preset=1, npeaks=10, dim=c(3,3))
+data <- data[,pData(data)$circle]
+
+# queue normalization
+data <- Cardinal::normalize(data, method="tic")
+
+# apply normalization
+data_normalized <- process(data)
+
 
 cardinal_peaks
 
@@ -252,21 +265,82 @@ image(cardinal, mz=207)
 
 image(cardinal, mz=112.9746)
 image(cardinal, mz=115.0517)
-
 image(cardinal, mz=649)
+?image
+?Cardinal::image
+
 
 # Building from Scratch a MSContinuousImagingExperiment
 # https://www.bioconductor.org/packages/release/bioc/vignettes/Cardinal/inst/doc/Cardinal-2-guide.html#building-from-scratch
 set.seed(2020)
 s <- simulateSpectrum(n=9, peaks=10, from=500, to=600)
+
+456/6
 str(s)
+s$mz
+attr(s$mz,"tolerance")
+attr(s$mz,"resolution")
+?attr
+head(s$mz)
+str(s$mz)
+length(s$mz)
+
+s$intensity
+head(s$intensity, n = 20)
+str(s$intensity)
+
+boxplot(s$intensity)
+boxplot(t(s$intensity))
+max(s$intensity)
+
 coord <- expand.grid(x=1:3, y=1:3)
+str(coord)
+attr(coord, "names")
+
+
 run <- factor(rep("run0", nrow(coord)))
+str(run)
+
 fdata <- MassDataFrame(mz=s$mz)
+str(fdata)
+
 pdata <- PositionDataFrame(run=run, coord=coord)
+
 out <- MSImagingExperiment(imageData=s$intensity,
                            featureData=fdata,
                            pixelData=pdata)
-head(s$intensity)
-dim(s$intensity)
+
+head( s$intensity )
+dim( s$intensity )
 ?PositionDataFrame
+
+str(out)
+
+pixelData(out)
+coord(out)
+featureData(out)
+imageData(out)
+iData(out)
+resolution(out)
+dim(out)
+plot(out)
+plot(out, pixel=c(3,1))
+plot(out, coord=list(x=0, y=0), plusminus=1, fun=mean)
+dev.off()
+image(out, mz = 500)
+Cardinal::image(out, mz=500, plusminus=100, fun=mean)
+?Cardinal::image
+
+image()
+
+image(out, mz=500, subset=run(out) == "run0")
+image(out,mz = c(510,600), subset = circle )
+
+
+image(out, mz=500, smooth.image="gaussian")
+image(out, mz=500, colorscale=magma)
+
+out_mean<- summarizeFeatures( out, "mean")
+plot(out_mean)
+out_mean_tic <- summarizePixels(out, c(tic="sum"))
+image( out_mean_tic)
